@@ -87,6 +87,9 @@ input:focus{outline:none;border-color:var(--gold)}
 .psst{display:inline-block;margin-top:10px;background:rgba(0,0,0,.25);border-radius:999px;padding:5px 14px;font-size:.88rem;color:var(--snow)}
 #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
 footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px}
+.music{position:fixed;z-index:15;right:max(16px,calc(env(safe-area-inset-right,0px) + 12px));bottom:calc(env(safe-area-inset-bottom,0px) + 16px);font-family:var(--display);font-weight:800;font-size:1rem;border:1px solid var(--line);border-radius:999px;padding:10px 16px;background:rgba(12,28,52,.85);color:var(--snow);cursor:pointer;backdrop-filter:blur(4px)}
+.music[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.music:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -111,6 +114,7 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px}
   <footer>Il sorteggio è già stato fatto: nessuno pesca sé stesso. Codice perso? Chiedilo a Kate.</footer>
 </div>
 
+<button class="music" id="music" type="button" aria-pressed="false">&#9834; Musica</button>
 <div class="veil" id="veil" hidden>
   <div class="box" role="dialog" aria-modal="true" aria-labelledby="mt" id="box">
     <button class="x" id="close" aria-label="Chiudi">&times;</button>
@@ -122,15 +126,15 @@ footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:34px}
 const SECRET={"salt": "f09dcb4531f26e8d", "s": {"Aurelio": {"k": "b98b799686dc", "c": 7}, "Lucia": {"k": "304770587e1d", "c": 1}, "Gabri": {"k": "6d76ac83cbfd", "c": 5}, "Anna": {"k": "b0e6025f8be2", "c": 8}, "Elena": {"k": "b30fc50a8492", "c": 9}, "Arnaud": {"k": "708361b265ac", "c": 8}, "Franci": {"k": "89b3a2a4c412", "c": 8}, "Matteo": {"k": "07fab7e7ebdf", "c": 0}, "Andre": {"k": "22a155d4f96f", "c": 6}, "Kate": {"k": "115acb03e354", "c": 3}}};
 const P=[
  {n:"Aurelio",t:"Babbo Natale in incognito",a:"laugh",skin:"#d9a27a",hair:"#9a8f86",hs:"bald",hat:"santa",sw:"#c8374f",sc:"#f7f4ee",glasses:1,gc:"#b8924e",mouth:"laugh",santa:1},
- {n:"Lucia",t:"La regina del panettone",a:"bob",skin:"#f0c9a8",hair:"#e6c77e",hs:"bob",hat:"holly",sw:"#cdb07a",sc:"#2f8a63",earr:1,glasses:1,gc:"#1f1a1c",pearls:1},
- {n:"Gabri",t:"Elfo in prova",a:"sway",skin:"#efc39c",hair:"#6b4428",hs:"short",hat:"elf",sw:"#f2c14e",sc:"#d9445c"},
- {n:"Anna",t:"Detective dei regali",a:"bob",skin:"#f3cbaa",hair:"#3a2a24",hs:"long",hat:"muffs",sw:"#7a5bc7",sc:"#f7f4ee"},
- {n:"Elena",t:"Renna onoraria",a:"sway",skin:"#f5d3b8",hair:"#cfb27f",hs:"tied",hat:"antlers",sw:"#2b9aa0",sc:"#d9445c",rednose:1,earr:1,freck:1,ec:"#3f5f86"},
+ {n:"Lucia",t:"Eleganza in perle",a:"bob",skin:"#f0c9a8",hair:"#e6c77e",hs:"bob",hat:"holly",sw:"#cdb07a",sc:"#2f8a63",earr:1,glasses:1,gc:"#1f1a1c",pearls:1},
+ {n:"Gabri",t:"L’unico di cui Anna non scopre i regali",a:"sway",skin:"#efc39c",hair:"#6b4428",hs:"short",hat:"elf",sw:"#f2c14e",sc:"#d9445c"},
+ {n:"Anna",t:"Sa cosa c’è sotto l’albero prima di Babbo Natale",a:"bob",skin:"#f3cbaa",hair:"#3a2a24",hs:"long",hat:"muffs",sw:"#7a5bc7",sc:"#f7f4ee"},
+ {n:"Elena",t:"Più veloce di Rudolph",a:"sway",skin:"#f5d3b8",hair:"#cfb27f",hs:"tied",hat:"antlers",sw:"#2b9aa0",sc:"#d9445c",rednose:1,earr:1,freck:1,ec:"#3f5f86"},
  {n:"Arnaud",t:"Ambasciatore della baguette",a:"bob",skin:"#eebf98",hair:"#3b2c25",hs:"short",hat:"beret",sw:"#25406e",sc:"#f7f4ee",beard:"#3b2c25",stripes:1},
- {n:"Franci",t:"Pura energia. Boing!",a:"laugh",skin:"#f2cba8",hair:"#a8794c",hs:"long",hat:"star",sw:"#efe2c8",sc:"#2f8a63",mouth:"laugh",beads:1},
+ {n:"Franci",t:"Accende anche l’albero",a:"laugh",skin:"#f2cba8",hair:"#a8794c",hs:"long",hat:"star",sw:"#efe2c8",sc:"#2f8a63",mouth:"laugh",beads:1},
  {n:"Matteo",t:"Pupazzo di neve certificato",a:"bob",skin:"#f0c8a6",hair:"#7a5a3c",hs:"short",hat:"beanie",hc:"#f7f4ee",sw:"#b7bcc4",sc:"#d9445c",stripesc:1,glasses:1,gc:"#7d828c",stub:1},
  {n:"Andre",t:"Buongustaio ufficiale",a:"sway",skin:"#eec3a0",hair:"#3a2a22",hs:"spiky",hat:"none",sw:"#f1df7e",sc:"#d9445c",beard:"#5e3d2a",wine:1},
- {n:"Kate",t:"Capo elfa e organizzatrice",a:"bob",skin:"#f5d2b5",hair:"#7a4a2c",hs:"long",hat:"elf",hatc:"#d9445c",sw:"#2f8a63",sc:"#f2c14e"}
+ {n:"Kate",t:"La regina del panettone",a:"bob",skin:"#f5d2b5",hair:"#7a4a2c",hs:"long",hat:"elf",hatc:"#d9445c",sw:"#2f8a63",sc:"#f2c14e"}
 ];
 const NAMES=P.map(p=>p.n);
 
@@ -231,6 +235,25 @@ function reveal(p,r){
     setTimeout(()=>{g.remove();document.getElementById("res").innerHTML=`<div class="reveal"><p>Sei il Babbo Natale segreto di</p>${char(r).replace('class="ch','class="pop ch')}<div class="big">${r.n}</div><p>${r.t}</p><span class="psst">Psst… acqua in bocca. Rimane tra te e Babbo Natale.</span></div>`;confetti()},rm?0:550)},rm?0:1000);
 }
 
+
+// music box: "Jingle Bells" (James Lord Pierpont, 1857, public domain), synthesized
+const Music=(()=>{const N={C:523.25,D:587.33,E:659.25,F:698.46,G:783.99};
+ const A=[["E",1],["E",1],["E",2],["E",1],["E",1],["E",2],["E",1],["G",1],["C",1.5],["D",.5],["E",4]];
+ const S=A.concat([["F",1],["F",1],["F",1.5],["F",.5],["F",1],["E",1],["E",1],["E",.5],["E",.5],["E",1],["D",1],["D",1],["E",1],["D",2],["G",2]],A,
+  [["F",1],["F",1],["F",1],["F",1],["F",1],["E",1],["E",1],["E",.5],["E",.5],["G",1],["G",1],["F",1],["D",1],["C",4]]);
+ const BASS={C:130.81,G:98,F:87.31};const prog=["C","C","C","C","F","C","G","G","C","C","C","C","F","C","G","C"];
+ let ctx,master,on=false,timer,next=0,i=0,beatAcc=0;const B=.36;
+ function tone(f,t,d,v,type){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.0008,t+Math.max(.25,d*1.6));o.connect(g);g.connect(master);o.start(t);o.stop(t+Math.max(.3,d*1.7))}
+ function sched(){while(next<ctx.currentTime+.4){const[n,d]=S[i];const len=d*B;tone(N[n],next,len,.16,"triangle");tone(N[n]*2,next,len*.6,.04,"sine");
+   if(beatAcc%2===0){const bar=Math.floor(beatAcc/4)%prog.length;tone(BASS[prog[bar]],next,B*1.5,.07,"sine")}
+   beatAcc+=d;next+=len;i=(i+1)%S.length;if(i===0){next+=B*2;beatAcc=0}}}
+ return{toggle(){try{if(!ctx){ctx=new (window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=.5;master.connect(ctx.destination)}}catch(e){return false}
+   on=!on;if(on){ctx.resume();next=ctx.currentTime+.05;timer=setInterval(sched,100)}else{clearInterval(timer);ctx.suspend()}return on},get on(){return on}}})();
+const mBtn=document.getElementById("music");
+function setM(v){mBtn.setAttribute("aria-pressed",v);mBtn.innerHTML=v?"&#9834; Musica: sì":"&#9834; Musica";try{localStorage.setItem("musicOff",v?"0":"1")}catch(e){}}
+mBtn.addEventListener("click",e=>{e.stopPropagation();setM(Music.toggle())});
+let firstTouch=true;let wantOff=false;try{wantOff=localStorage.getItem("musicOff")==="1"}catch(e){}
+document.addEventListener("pointerdown",e=>{if(!firstTouch||e.target===mBtn)return;firstTouch=false;if(!wantOff&&!Music.on)setM(Music.toggle())},{capture:true});
 // snow
 (function(){const cv=document.getElementById("snow"),x=cv.getContext("2d");let W,H,fl=[];
   function rs(){W=cv.width=innerWidth*devicePixelRatio;H=cv.height=innerHeight*devicePixelRatio;fl=Array.from({length:Math.round(innerWidth/9)},()=>({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*2.2+.6)*devicePixelRatio,s:Math.random()*.6+.3,d:Math.random()*6}))}
